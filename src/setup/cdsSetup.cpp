@@ -5,9 +5,8 @@ cds_t *cdsSetup(nrs_t *nrs, setupAide options)
   platform_t *platform = platform_t::getInstance();
   device_t &device = platform->device;
 
-  cds->mesh[0] = nrs->_mesh;
-  mesh_t *mesh = cds->mesh[0];
-  cds->meshV = nrs->_mesh->fluid;
+  mesh_t *mesh = nrs->_mesh; // Tmesh
+  cds->meshV = nrs->_mesh->fluid; //Vmesh
   cds->elementType = nrs->elementType;
   cds->dim = nrs->dim;
   cds->NVfields = nrs->NVfields;
@@ -27,11 +26,15 @@ cds_t *cdsSetup(nrs_t *nrs, setupAide options)
 
   cds->vFieldOffset = nrs->fieldOffset;
   cds->vCubatureOffset = nrs->cubatureOffset;
-  cds->fieldOffset[0] = nrs->fieldOffset;
-  cds->fieldOffsetScan[0] = 0;
-  dlong sum = cds->fieldOffset[0];
-  for (int s = 1; s < cds->NSfields; ++s) {
-    cds->fieldOffset[s] = cds->fieldOffset[0];
+  dlong sum = 0;
+  for (int s = 0; s < cds->NSfields; ++s) {
+    if (options.compareArgs("SCALAR" + scalarDigitStr(s) + " USE TMESH", "TRUE")) {
+      cds->mesh[s] = nrs->_mesh;
+    }
+    else {
+      cds->mesh[s] = nrs->meshV;
+    }
+    cds->fieldOffset[s] = nrs->fieldOffset;
     cds->fieldOffsetScan[s] = sum;
     sum += cds->fieldOffset[s];
     cds->mesh[s] = cds->mesh[0];
@@ -106,8 +109,7 @@ cds_t *cdsSetup(nrs_t *nrs, setupAide options)
     cds->anyCvodeSolver |= cds->cvodeSolve[is];
     cds->anyEllipticSolver |= (!cds->cvodeSolve[is] && cds->compute[is]);
 
-    mesh_t *mesh;
-    (is) ? mesh = cds->meshV : mesh = cds->mesh[0]; // only first scalar can be a CHT mesh
+    mesh_t *mesh = cds->mesh[is];
 
     int cnt = 0;
     for (int e = 0; e < mesh->Nelements; e++) {

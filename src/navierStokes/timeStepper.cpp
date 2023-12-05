@@ -502,8 +502,7 @@ void makeq(nrs_t *nrs, dfloat time, int tstep, occa::memory o_FS, occa::memory o
 
     std::string sid = scalarDigitStr(is);
 
-    mesh_t *mesh;
-    (is) ? mesh = cds->meshV : mesh = cds->mesh[0];
+    mesh_t *mesh = cds->mesh[is];
     const dlong isOffset = cds->fieldOffsetScan[is];
 
     if (platform->options.compareArgs("SCALAR" + sid + " REGULARIZATION METHOD", "HPFRT")) {
@@ -625,8 +624,7 @@ void scalarSolve(nrs_t *nrs, dfloat time, occa::memory o_S, int stage)
     if (!cds->compute[is] || cds->cvodeSolve[is])
       continue;
 
-    mesh_t *mesh;
-    (is) ? mesh = cds->meshV : mesh = cds->mesh[0];
+    mesh_t *mesh = cds->mesh[is];
 
     cds->setEllipticCoeffKernel(mesh->Nlocal,
                                 cds->g0 * cds->idt,

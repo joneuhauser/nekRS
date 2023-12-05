@@ -7,10 +7,7 @@ occa::memory cdsSolve(const int is, cds_t* cds, dfloat time, int stage)
   std::string sid = scalarDigitStr(is);
 
   platform->timer.tic("scalar rhs", 1);  
-  mesh_t* mesh = cds->mesh[0];
-  if(is) {
-    mesh = cds->meshV;
-  }
+  mesh_t* mesh = cds->mesh[is];
 
   platform->o_mempool.slice1.copyFrom(cds->o_BF, cds->fieldOffset[is] * sizeof(dfloat), 0,  
                                       cds->fieldOffsetScan[is] * sizeof(dfloat));

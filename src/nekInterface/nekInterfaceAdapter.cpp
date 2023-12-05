@@ -847,7 +847,7 @@ int setup(nrs_t *nrs_in)
       if (rank == 0) printf(" scalar%02d\n", is);
 
       int isTMesh = 0;
-      if (cht && is == 0)
+      if (options->compareArgs("SCALAR" + sid + " USE TMESH", "TRUE"))
         isTMesh = 1;
       int nIDs = (*nek_nbid_ptr)(&isTMesh);
 
@@ -926,8 +926,7 @@ void copyToNek(dfloat time)
   if (nrs->Nscalar) {
     const dlong nekFieldOffset = nekData.lelt * mesh->Np;
     for (int is = 0; is < nrs->Nscalar; is++) {
-      mesh_t *mesh;
-      (is) ? mesh = nrs->cds->meshV : mesh = nrs->cds->mesh[0];
+      mesh_t *mesh = nrs->cds->mesh[is];
       const dlong Nlocal = mesh->Nelements * mesh->Np;
       dfloat *Ti = nekData.t + is * nekFieldOffset;
       dfloat *Si = nrs->cds->S + nrs->cds->fieldOffsetScan[is];
@@ -1047,8 +1046,7 @@ void copyFromNek(dfloat &time)
   if (nrs->Nscalar) {
     const dlong nekFieldOffset = nekData.lelt * mesh->Np;
     for (int is = 0; is < nrs->Nscalar; is++) {
-      mesh_t *mesh;
-      (is) ? mesh = nrs->cds->meshV : mesh = nrs->cds->mesh[0];
+      mesh_t *mesh = nrs->cds->mesh[is];
       const dlong Nlocal = mesh->Nelements * mesh->Np;
       dfloat *Ti = nekData.t + is * nekFieldOffset;
       dfloat *Si = nrs->cds->S + nrs->cds->fieldOffsetScan[is];

@@ -190,12 +190,14 @@ static std::vector<std::string> temperatureKeys = {
     {"rhoCp"},
     {"conductivity"},
     {"absolutetol"},
+    {"tmesh"},
 };
 
 static std::vector<std::string> scalarKeys = {
     {"rho"},
     {"diffusivity"},
     {"absolutetol"},
+    {"tmesh"},
 };
 
 static std::vector<std::string> cvodeKeys = {
@@ -2143,6 +2145,11 @@ void parseScalarSections(const int rank, setupAide &options, inipp::Ini *par)
     if (par->extract("temperature", "boundarytypemap", s_bcMap)) {
       options.setArgs("SCALAR" + sid + " BOUNDARY TYPE MAP", s_bcMap);
     }
+
+    std::string useTmeshStr;
+    par->extract("temperature", "tmesh", useTmeshStr);
+    options.setArgs("SCALAR" + sid + " USE TMESH", checkForFalse(useTmeshStr) ? "FALSE" : "TRUE");
+
   }
 
   const auto sections = par->sections;
@@ -2277,6 +2284,9 @@ void parseScalarSections(const int rank, setupAide &options, inipp::Ini *par)
       // do not throw if generic [SCALAR] section _or_ [SCALAR0X] with a generic [SCALAR] section specifying
       // the boundary conditions
     }
+    std::string useTmeshStr;
+    par->extract(parScope, "tmesh", useTmeshStr);
+    options.setArgs("SCALAR" + sid + " USE TMESH", checkForFalse(useTmeshStr) ? "FALSE" : "TRUE");
   };
 
   // If applicable, read default section first.
@@ -2287,7 +2297,7 @@ void parseScalarSections(const int rank, setupAide &options, inipp::Ini *par)
   // For all scalars != temperature, set defaults from generic [SCALAR] section.
   // All SCALAR_DEFAULT <...> options are transferred to SCALAR{is} <...>
   const std::string defaultSettingStr = "SCALAR DEFAULT ";
-  for (int is = 1; is < nscal; ++is) {
+  for (int is = 0; is < nscal; ++is) {
     std::string sid = scalarDigitStr(is);
     const auto options_ = options;
     for (auto [keyWord, value] : options_) {

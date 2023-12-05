@@ -107,8 +107,7 @@ void printICMinMax(nrs_t *nrs)
     for (int is = 0; is < cds->NSfields; is++) {
       cnt++;
 
-      mesh_t *mesh;
-      (is) ? mesh = cds->meshV : mesh = cds->mesh[0]; // only first scalar can be a CHT mesh
+      mesh_t *mesh = cds->mesh[is]; // only first scalar can be a CHT mesh
 
       auto o_si = nrs->cds->o_S + nrs->cds->fieldOffsetScan[is] * sizeof(dfloat);
       const auto siMin = platform->linAlg->min(mesh->Nlocal, o_si, platform->comm.mpiComm);
@@ -242,7 +241,11 @@ void nrsSetup(MPI_Comm comm, setupAide &options, nrs_t *nrs)
     auto fields = fieldsToSolve(options);
 
     for (const auto &field : fields) {
-      auto msh = (nrs->cht && (field == "scalar00" || field == "mesh")) ? nrs->_mesh : mesh;
+      mesh_t* msh = nrs->meshV;
+      if (field.find("SCALAR") != std::string::npos 
+          && options.compareArgs(field + " USE TMESH", "TRUE")) 
+        msh = nrs->_mesh;
+      if (nrs->cht && field == "mesh") msh = nrs->_mesh;
       nrsCheck(msh->Nbid != bcMap::size(field),
                platform->comm.mpiComm,
                EXIT_FAILURE,
@@ -683,8 +686,7 @@ void nrsSetup(MPI_Comm comm, setupAide &options, nrs_t *nrs)
         continue;
       }
 
-      mesh_t *mesh;
-      (is) ? mesh = cds->meshV : mesh = cds->mesh[0]; // only first scalar can be a CHT mesh
+      mesh_t *mesh = cds->mesh[is];
 
       const auto solverName = cds->cvodeSolve[is] ? "CVODE" : "ELLIPTIC";
       if (platform->comm.mpiRank == 0) {

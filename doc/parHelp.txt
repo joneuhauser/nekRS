@@ -173,6 +173,9 @@ viscosity                   <float>                                    dynamic v
 rhoCp                       <float>                                    rho*Cp 
 
 conductivity                <float>                                    thermal conductivity 
+
+tmesh                       <bool>                                     evaluate temperature on Tmesh
+                                                                       (conjugate heat transfer)
 ----------------------------------------------------------------------------------------------------------------------
 [SCALAR]                                                               default scalar section, see general::nScalars
                                                                        all non-temperature scalars will have settings
@@ -181,12 +184,18 @@ conductivity                <float>                                    thermal c
 rho                         <float>                                    density
 
 diffusivity                 <float>                                    diffusivity 
+
+tmesh                       <bool>                                     evaluate scalar on Tmesh
+                                                                       (conjugate heat transfer)
 ----------------------------------------------------------------------------------------------------------------------
 [SCALAR01]
 
 rho                         <float>                                    density
 
 diffusivity                 <float>                                    diffusivity 
+
+tmesh                       <bool>                                     evaluate scalar on Tmesh
+                                                                       (conjugate heat transfer)
 ----------------------------------------------------------------------------------------------------------------------
 [SCALAR02]
 ...
