@@ -37,7 +37,6 @@ cds_t *cdsSetup(nrs_t *nrs, setupAide options)
     cds->fieldOffset[s] = nrs->fieldOffset;
     cds->fieldOffsetScan[s] = sum;
     sum += cds->fieldOffset[s];
-    cds->mesh[s] = cds->mesh[0];
   }
   cds->fieldOffsetSum = sum;
 
@@ -91,7 +90,7 @@ cds_t *cdsSetup(nrs_t *nrs, setupAide options)
   cds->anyCvodeSolver = false;
   cds->anyEllipticSolver = false;
 
-  cds->EToBOffset = cds->mesh[0]->Nelements * cds->mesh[0]->Nfaces;
+  cds->EToBOffset = nrs->_mesh->Nelements * nrs->_mesh->Nfaces;
 
   cds->EToB = (int *)calloc(cds->EToBOffset * cds->NSfields, sizeof(int));
 
@@ -161,7 +160,7 @@ cds_t *cdsSetup(nrs_t *nrs, setupAide options)
   if (scalarFilteringEnabled) {
 
     std::vector<dlong> applyFilterRT(cds->NSfields, 0);
-    const dlong Nmodes = cds->mesh[0]->N + 1;
+    const dlong Nmodes = nrs->_mesh->N + 1;
     cds->o_filterMT = platform->device.malloc(cds->NSfields * Nmodes * Nmodes, sizeof(dfloat));
     cds->o_filterS = platform->device.malloc(cds->NSfields, sizeof(dfloat));
     cds->o_applyFilterRT = platform->device.malloc(cds->NSfields, sizeof(dlong));
